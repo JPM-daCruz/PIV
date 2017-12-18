@@ -4,8 +4,8 @@ close all;
 clc;
 
 %isto é para substituir quando for para entregar o projecto
-numero_imagens=200;
-imagens_background=100;
+numero_imagens=25;
+imagens_background=20;
 tracked_objs = cell(1,[]);
 nome_depth='depth';
 nome_rgb='rgb_image';
@@ -25,7 +25,7 @@ for i=1:length(r)
 end
 background1=median(array1,3);
 background2=median(array2,3);
-%imagesc(background1);
+imagesc(background1);
 clear array1 array2 nome1 nome2 depth_array;
 xyz_background1=get_xyzasus(background1(:), [480 640], find(background1(:)>0), cam_params.Kdepth, 1, 0);
 xyz_background2=get_xyzasus(background2(:), [480 640], find(background2(:)>0), cam_params.Kdepth, 1, 0);
@@ -46,95 +46,19 @@ for i=1:numero_imagens
     xyz_original_1=get_xyzasus(depth1(:), [480 640], find(depth1(:)>0), cam_params.Kdepth, 1, 0);
     xyz_original_2=get_xyzasus(depth2(:), [480 640], find(depth2(:)>0), cam_params.Kdepth, 1, 0);
 
-    if i==1
-       %trata-se da primeira imagem de cada câmara, vamos assim dar inicio 
-       %ao processo. Por este motivo, existe um if exclusivo à primeira
-       %imagem ao passo que as restantes são trabalhadas numa outra região
-       
-       %Remoção do background e pequena filtragem da imagem-elimina
-       %background, coloca a zeros na depth os pontos em que o background
-       %se encontra a zero, e coloca a zeros na depth pontos que tenham um
-       %profundidade superior a 6m
-       	for aux1=1:480
-            for aux2=1:640
-                if (abs(depth1(aux1,aux2)-background1(aux1,aux2))<150)
-                    depth1(aux1,aux2)=0;
-                end
-                if (background1(aux1,aux2)==0)
-                    depth1(aux1,aux2)=0;
-                end
-                if (depth1(aux1,aux2)>6000)
-                    depth1(aux1,aux2)=0;
-                end
-                if (abs(depth2(aux1,aux2)-background2(aux1,aux2))<150)
-                    depth2(aux1,aux2)=0;
-                end
-                if (background2(aux1,aux2)==0)
-                    depth2(aux1,aux2)=0;
-                end
-                if (depth2(aux1,aux2)>6000)
-                    depth2(aux1,aux2)=0; 
-                end
-            end
-        end
-        clear aux1 aux2;
-        %Calculo de xyz da depth correspondente às primeiras imagens
-        xyz_1=get_xyzasus(depth1(:), [480 640], find(depth1(:)>0), cam_params.Kdepth, 1, 0);
-        xyz_2=get_xyzasus(depth2(:), [480 640], find(depth2(:)>0), cam_params.Kdepth, 1, 0);
-        
-        %deteção de regiões ligadas na profundidade
-        [L1, num1]=bwlabel(depth1);
-        [L2, num2]=bwlabel(depth2);
-        
-        %Remoção de uniões com menos de 450 pontos
-        for aux1=1:num1
-            [row, col]=find(L1==aux1);
-            if (length(row)<450)
-               %significa que este este conjunto de pontos tem menos de 450
-               % pontos, deve ser removido
-               for aux2=1:length(row)
-                   L1(row(aux2),col(aux2))=0;
-               end
-            end
-        end
-        for aux1=1:num2
-            [row, col]=find(L2==aux1);
-            if (length(row)<450)
-                for aux2=1:length(row)
-                   L2(row(aux2),col(aux2))=0; 
-                end
-            end
-        end
-        [L1, num1]=bwlabel(L1);
-        [L2, num2]=bwlabel(L2);
-    end
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
     %% mapeamento das coordenadas de um ponto depth na imagem RGB
     RT=horzcat(cam_params.R, cam_params.T);
-    homogeneas1(1,:)=xyz_d1(:,1);
-    homogeneas1(2,:)=xyz_d1(:,2);
-    homogeneas1(3,:)=xyz_d1(:,3);
+    homogeneas1(1,:)=xyz_original_1(:,1);
+    homogeneas1(2,:)=xyz_original_1(:,2);
+    homogeneas1(3,:)=xyz_original_1(:,3);
     homogeneas1(4,:)=1;
     lambda_u_v1=cam_params.Krgb*RT*homogeneas1;
     u_v1(1,:)=lambda_u_v1(1,:)./lambda_u_v1(3,:);
     u_v1(2,:)=lambda_u_v1(2,:)./lambda_u_v1(3,:);
     
-    homogeneas2(1,:)=xyz_d2(:,1);
-    homogeneas2(2,:)=xyz_d2(:,2);
-    homogeneas2(3,:)=xyz_d2(:,3);
+    homogeneas2(1,:)=xyz_original_2(:,1);
+    homogeneas2(2,:)=xyz_original_2(:,2);
+    homogeneas2(3,:)=xyz_original_2(:,3);
     homogeneas2(4,:)=1;
     lambda_u_v1=cam_params.Krgb*RT*homogeneas1;
     u_v1(1,:)=lambda_u_v1(1,:)./lambda_u_v1(3,:);
@@ -165,9 +89,9 @@ for i=1:numero_imagens
     end
     clear aux1 aux2;
     figure(1)
-    imagesc([depth1, depth2]);
+    imagesc(depth1);
     figure(2)
-    imagesc([im1, im2]);
+    imagesc(im1);
     pause(0.1)
     %% Filtro do gradiente
     %[fx1, fy1]=gradient(mat2gray(depth1));
@@ -195,8 +119,8 @@ for i=1:numero_imagens
     p2=pointCloud(xyz_2,'Color',cl2);
     figure(3);
     showPointCloud(p1);
-    figure(4);
-    showPointCloud(p2);
+    %figure(4);
+    %showPointCloud(p2);
     
     [L1, num1]=bwlabel(depth1);
     [L2, num2]=bwlabel(depth2);
@@ -204,9 +128,9 @@ for i=1:numero_imagens
     %% forground tem de ter pelo menos 400 pontos no rgb
     for aux1=1:num1
        [row, col, v] = find(L1==aux1);
-       if(length(row)<450)
+       if(length(row)<200)
             for aux2=1:length(row)
-                L1(row, col)=0;
+                L1(row(aux2), col(aux2))=0;
             end
        end
     end
@@ -215,7 +139,7 @@ for i=1:numero_imagens
         [row, col, v] = find(L2==aux1);
         if(length(row)<450)
             for aux2=1:length(row)
-                L2(row, col)=0;
+                L2(row(aux2), col(aux2))=0;
             end
        end 
     end
@@ -223,12 +147,51 @@ for i=1:numero_imagens
     [L1, num1] = bwlabel(L1);%Repoem os valores da label para 0,1,2 em vez de 400
     [L2, num2] = bwlabel(L2);
     figure(6);
-    imagesc([L1 L2]);
+    imagesc(L1);
     %pause(0.5);
-    for aux1=1:num1
-    end
+
     for aux1=1:num2
-        [row, col, v]=find(L2==aux1);
+        [row, col]=find(L2==aux1)
+        xmax=0;
+        ymax=0;
+        zmax=0;
+        xmin=6;
+        ymin=6;
+        zmin=6;
+        for aux2=1:length(row)
+            linear=sub2ind([480 640],row(aux2),col(aux2));
+            if(xyz_original_1(linear,1)>xmax)%xmax
+                xmax=xyz_original_1(linear,1);
+            end
+            if(xyz_original_1(linear,1)<xmin)%xmin
+                xmin=xyz_original_1(linear,1);
+            end
+            if(xyz_original_1(linear,2)>ymax)%ymax
+                ymax=xyz_original_1(linear,2);
+            end
+            if(xyz_original_1(linear,2)<ymin)%ymin
+                ymin=xyz_original_1(linear,2);
+            end
+            if(xyz_original_1(linear,3)>zmax)%zmax
+                zmax=xyz_original_1(linear,3);
+            end
+            if(xyz_original_1(linear,3)<zmin)%zmin
+                zmin=xyz_original_1(linear,3);
+            end
+        end
+        %Fornece as coordenadas limites do objecto
+        figure(10);
+        showPointCloud(p2);
+        hold on;
+        scatter3(xmin,ymin,zmin,'*');
+        scatter3(xmin,ymin,zmax,'*');
+        scatter3(xmin,ymax,zmin,'*');
+        scatter3(xmin,ymax,zmax,'*');
+        scatter3(xmax,ymin,zmin,'*');
+        scatter3(xmax,ymin,zmax,'*');
+        scatter3(xmax,ymax,zmin,'*');
+        scatter3(xmax,ymax,zmax,'*');
+
     end
  
     stat1 = regionprops(L1,'centroid', 'Area');
