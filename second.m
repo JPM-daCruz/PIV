@@ -26,7 +26,8 @@ cl1=reshape(im1,480*640,3);
 cl2=reshape(im2,480*640,3);
 p1=pointCloud(xyz_1,'Color',cl1);
 p2=pointCloud(xyz_2,'Color',cl2);
-
+%% conversão das coordenadas xyz de cada ponto da depth, para indices u,v da
+%imagem rgb
 RT=horzcat(cam_params.R, cam_params.T);
 homogeneas1(1,:)=xyz_1(:,1);
 homogeneas1(2,:)=xyz_1(:,2);
@@ -44,18 +45,19 @@ lambda_u_v2=cam_params.Krgb*RT*homogeneas2;
 u_v2(1,:)=lambda_u_v2(1,:)./lambda_u_v2(3,:);
 u_v2(2,:)=lambda_u_v2(2,:)./lambda_u_v2(3,:);
 
-
+%% Deteção de pontos de interesse e match dos pontos de interesse entre imagens
 [f1,d1] = vl_sift(single(rgb2gray(im1)));
 [f2,d2] = vl_sift(single(rgb2gray(im2)));
 [matches, scores] = vl_ubcmatch(d1, d2);
 
-% Indices d u e v da imagem rgb associados aos matches
+%% indices u e v dos ponto de rgb onde houve match
 for i=1:length(matches)
     uv1(:,i)=f1(1:2,matches(1,i));
     uv2(:,i)=f2(1:2,matches(2,i));    
 end
 
-%calculo da distancia euclidiana
+%melhor correspondência entre os pontos detetados pelo sift e aqueles que
+%nós conhecemos as coordenadas xyz
 for i=1:length(matches)
     euclideana1=sqrt((uv1(1,i)-u_v1(1,:)).^2+(uv1(2,i)-u_v1(2,:)).^2);
     euclideana2=sqrt((uv2(1,i)-u_v2(1,:)).^2+(uv2(2,i)-u_v2(2,:)).^2);
@@ -97,9 +99,12 @@ xyz_inliers2=xyz2(:,melhores_inliers);
 rfinal=transform.T';
 tfinal=transform.c(1,:)';
 xyz_1=xyz_1';
-for i=1:length(xyz_1)
-   xyz_2r(i,:)=rfinal*xyz_1(:,i)+tfinal;
-end
+
+xyz_2r=rfinal*xyz_1+repmat(tfinal,1,length(xyz_1));
+xyz_2r=xyz_2r';
+%for i=1:length(xyz_1)
+%   xyz_2r(i,:)=rfinal*xyz_1(:,i)+tfinal;
+%end
 
 ptotal=pointCloud([xyz_2r;xyz_2],'Color',[cl1;cl2]);
 showPointCloud(ptotal);
