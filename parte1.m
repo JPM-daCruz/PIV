@@ -1,9 +1,9 @@
-%inicialização
+%inicializaï¿½ï¿½o
 clear all;
 close all;
 clc;
 
-%declaração de variaveis globais
+%declaraï¿½ï¿½o de variaveis globais
 numero_imagens=25;
 imagens_background=round(numero_imagens*0.4);
 nome_depth='depth';
@@ -11,7 +11,7 @@ nome_rgb='rgb_image';
 load cameraparametersAsus.mat;
 objects(1)=struct('x',[],'y',[],'z',[],'frames_tracked',[]);
 
-%% Cálculo da imagem depth de background para as duas câmaras, e das respectivas coordenadas
+%% Cï¿½lculo da imagem depth de background para as duas cï¿½maras, e das respectivas coordenadas
 back1=zeros(480,640, imagens_background);
 back2=zeros(480,640, imagens_background);
 i=1;
@@ -34,12 +34,12 @@ clear nome1_depth nome2_depth i imagens_background;
 
 %% Ciclo principal do projecto
 %Este ciclo percorre todas as imagens, deteta os objectos, efetua o seu
-%tracking e armazena a informação devidamente
+%tracking e armazena a informaï¿½ï¿½o devidamente
 
 for i=1:numero_imagens
     if i==1
-        %é a primeira imagem de cada câmara, logo não é preciso comparar os
-        %objectos detetados com nada, é só inserir
+        %ï¿½ a primeira imagem de cada cï¿½mara, logo nï¿½o ï¿½ preciso comparar os
+        %objectos detetados com nada, ï¿½ sï¿½ inserir
         nome1_depth=strcat(nome_depth,num2str(1),'_',num2str(i),'.mat');
         nome2_depth=strcat(nome_depth,num2str(2),'_',num2str(i),'.mat');
         nome1_rgb=strcat(nome_rgb,num2str(1),'_',num2str(i),'.png');
@@ -57,13 +57,13 @@ for i=1:numero_imagens
         xyz_original_1=get_xyzasus(im_depth1(:), [480 640], find(im_depth1(:)>0), cam_params.Kdepth, 1, 0);
         xyz_original_2=get_xyzasus(im_depth2(:), [480 640], find(im_depth2(:)>0), cam_params.Kdepth, 1, 0);
     
-        %% Remoção do background
+        %% Remoï¿½ï¿½o do background
         %Retira o background, retira pontos a que a profundidade seja superior
-        %a 6,5m por não serem precisos, e retira pontos em que na imagem de
-        %background a profundidade é nula, por não serem pontos válidos
+        %a 6,5m por nï¿½o serem precisos, e retira pontos em que na imagem de
+        %background a profundidade ï¿½ nula, por nï¿½o serem pontos vï¿½lidos
         for aux1=1:480
         for aux2=1:640
-            %câmara 1
+            %cï¿½mara 1
             %if aux1==129 && aux2==523
             %    debug=1;
             %end
@@ -76,7 +76,7 @@ for i=1:numero_imagens
             if (back1(aux1,aux2)==0)
                 im_depth1(aux1,aux2)=0;
             end
-            %câmara 2
+            %cï¿½mara 2
             if ((back2(aux1,aux2)-im_depth2(aux1,aux2))<=250)
                 im_depth2(aux1,aux2)=0;
             end
@@ -102,12 +102,12 @@ for i=1:numero_imagens
         p2=pointCloud(xyz_backremoved2,'Color',cl2);
 
 
-        %% Deteção de objectos na imagem de profundidade
+        %% Deteï¿½ï¿½o de objectos na imagem de profundidade
         [l1, num1]=bwlabel(im_depth1);
         for aux1=1:num1
         [row, col]=find(l1==aux1);
        	if(length(row)<400)
-        %significa que não tem pontos suficientes, logo não é objecto
+        %significa que nï¿½o tem pontos suficientes, logo nï¿½o ï¿½ objecto
             for aux2=1:length(row)
                 l1(row(aux2), col(aux2))=0;
             end
@@ -119,7 +119,7 @@ for i=1:numero_imagens
         for aux1=1:num2
         [row, col]=find(l2==aux1);
         if(length(row)<400)
-            %significa que nao tem pontos suficientes, logo não é objecto
+            %significa que nao tem pontos suficientes, logo nï¿½o ï¿½ objecto
             for aux2=1:length(row)
                 l2(row(aux2), col(aux2))=0;
         	end
@@ -131,8 +131,8 @@ for i=1:numero_imagens
         imagesc([l1, l2]);
         figure(8);
         imagesc([im_rgb1, im_rgb2]);
-        %Filtro para garantir que não há pontos incorretamente medidos na
-        %extremidade dos objectos que levem, a uma incorreta obtenção da caixa
+        %Filtro para garantir que nï¿½o hï¿½ pontos incorretamente medidos na
+        %extremidade dos objectos que levem, a uma incorreta obtenï¿½ï¿½o da caixa
         l1=imclose(l1, strel('disk',10));
         l2=imclose(l2, strel('disk',10));
     
@@ -149,9 +149,9 @@ for i=1:numero_imagens
         figure(9);
         imagesc([im_depth1, G1]);
     
-        %% Cálculo das caixas para cada um dos objectos detetados nas duas imagens
+        %% Cï¿½lculo das caixas para cada um dos objectos detetados nas duas imagens
         %este ciclo percorre todos os objectos encontrados na imagem 1 e calcula a caixa no
-        %qual cada um está incluido. os valores limites da caixa devem depois
+        %qual cada um estï¿½ incluido. os valores limites da caixa devem depois
         %ser armazenados na estrutura correspondnete ao tracking
         xmax_1=zeros(1,num1);
         ymax_1=zeros(1,num1);
@@ -184,7 +184,7 @@ for i=1:numero_imagens
             end
         end
         %este ciclo percorre todos os objectos encontrados na imagem 2 e
-        %calcula a caixa no qual cada objecto está incluido. Os valores limites
+        %calcula a caixa no qual cada objecto estï¿½ incluido. Os valores limites
         %da caixa devem depois ser armazenados para posteriormente serem
         %colocados na estrutura dos objectos detetados
         xmax_2=zeros(1,num2);
@@ -220,7 +220,7 @@ for i=1:numero_imagens
     
         regioes_camara1=num1;
         regioes_camara2=num2;
-        %fim da análise da imagem1
+        %fim da anï¿½lise da imagem1
         for aux1=1:num1
             objects(aux1).x=[xmin_1(1,aux1), xmin_1(1,aux1), xmin_1(1,aux1), xmin_1(1,aux1), xmax_1(1,aux1), xmax_1(1,aux1), xmax_1(1,aux1), xmax_1(1,aux1)];
             objects(aux1).y=[ymin_1(1,aux1), ymin_1(1,aux1), ymax_1(1,aux1), ymax_1(1,aux1), ymin_1(1,aux1), ymin_1(1,aux1), ymax_1(1,aux1), ymax_1(1,aux1)];
@@ -228,8 +228,193 @@ for i=1:numero_imagens
             objects(aux1).frames_tracked=1;
         end
     else
-        %a partir daqui já temos de comparar a imagem em questão com a
-        %última imagem para proceder ao tracking de objectos
+        %a partir daqui jï¿½ temos de comparar a imagem em questï¿½o com a
+        %ï¿½ltima imagem para proceder ao tracking de objectos
     end
   
 end
+
+
+
+
+
+
+
+function [ s ] = verificar_separacoes( s )
+% VERIFICAR_SEPARACOES Esta funï¿½ï¿½o tem como objectivo analisar se alguma das
+% regiï¿½es se dividiu dando origem a duas ou mais regiï¿½es.
+% Comeï¿½a por verificar se existe mais do que uma regï¿½o na imagem e, caso
+% existam, verifica se podem pertencer ï¿½ mesma pessoa. Para isso,
+% verifica se a distï¿½ncia entre cada par de regiï¿½es ï¿½ inferior a um
+% determinado valor. Caso se verifique, assume-se que as vï¿½rias regiï¿½es
+% correspondem ï¿½ mesma pessoa e por isso, faz-se uma conjugaï¿½ï¿½o de todos
+% os centroides, obtendo-se o ponto mï¿½dio, e somam-se as vï¿½rias ï¿½reas e
+% os vï¿½rios nï¿½meros de pontos.
+    
+    k = 1;
+    ind_apagar = 1;
+   
+    if length(s) == 1
+        % Nï¿½o ocorreu nenhuma separaï¿½ï¿½o em nenhuma regiï¿½o porque apenas
+        % existe uma regiï¿½o
+
+    elseif length(s) > 1
+        
+        for i=1:length(s)
+            for j=(i+1):length(s)               
+                   
+                if norm(s(i).Centroid - s(j).Centroid) < 46
+                    array(k,1)=i;
+                    array(k,2)=j;
+                    array(k,3)=s(i).Area;
+                    array(k,4)=s(j).Area;
+                    array(k,5)=s(i).N_pontos;
+                    array(k,6)=s(j).N_pontos;
+                    k = k+1;
+                end                  
+            end
+        end
+        
+        % Depois de verificadas as separaï¿½ï¿½es ï¿½ necessï¿½rio juntar as regiï¿½es.
+        % Para isso vai-se juntar as ï¿½reas mais pequenas ï¿½s maiores.
+        if k > 1
+            
+            [linhas,~] = size(array);
+            
+            for i=1:linhas    
+                if array(i,1) ~= array(i,2)
+                    if array(i,3) > array(i,4)
+                        control = 1;             
+                    else
+                        control = 2;                   
+                    end      
+                
+                    % Atribuiï¿½ï¿½o dos valores de ï¿½rea e do nï¿½mero de pontos
+                    s(array(i,control)).Area = array(i,3)+array(i,4);
+                    s(array(i,control)).N_pontos = array(i,5)+array(i,6);
+
+                    % Cï¿½lculo do novo centroide corresponderï¿½ ao ponto mï¿½dio
+                    % entre os dois anteriores
+                    dif1_medio = abs(s(array(i,1)).Centroid(1) - s(array(i,2)).Centroid(1))/2;
+                    dif2_medio = abs(s(array(i,1)).Centroid(2) - s(array(i,2)).Centroid(2))/2;
+                
+                    if s(array(i,1)).Centroid(1) > s(array(i,2)).Centroid(1)
+                        s(array(i,control)).Centroid(1) = s(array(i,2)).Centroid(1) + dif1_medio;
+                    else
+                        s(array(i,control)).Centroid(1) = s(array(i,1)).Centroid(1) + dif1_medio;
+                    end
+
+                    if s(array(i,1)).Centroid(2) > s(array(i,2)).Centroid(2)
+                        s(arfunction [ s ] = verificar_separacoes( s )
+% VERIFICAR_SEPARACOES Esta funï¿½ï¿½o tem como objectivo analisar se alguma das
+% regiï¿½es se dividiu dando origem a duas ou mais regiï¿½es.
+% Comeï¿½a por verificar se existe mais do que uma regï¿½o na imagem e, caso
+% existam, verifica se podem pertencer ï¿½ mesma pessoa. Para isso,
+% verifica se a distï¿½ncia entre cada par de regiï¿½es ï¿½ inferior a um
+% determinado valor. Caso se verifique, assume-se que as vï¿½rias regiï¿½es
+% correspondem ï¿½ mesma pessoa e por isso, faz-se uma conjugaï¿½ï¿½o de todos
+% os centroides, obtendo-se o ponto mï¿½dio, e somam-se as vï¿½rias ï¿½reas e
+% os vï¿½rios nï¿½meros de pontos.
+    
+    k = 1;
+    ind_apagar = 1;
+   
+    if length(s) == 1
+        % Nï¿½o ocorreu nenhuma separaï¿½ï¿½o em nenhuma regiï¿½o porque apenas
+        % existe uma regiï¿½o
+
+    elseif length(s) > 1
+        
+        for i=1:length(s)
+            for j=(i+1):length(s)               
+                   
+                if norm(s(i).Centroid - s(j).Centroid) < 46
+                    array(k,1)=i;
+                    array(k,2)=j;
+                    array(k,3)=s(i).Area;
+                    array(k,4)=s(j).Area;
+                    array(k,5)=s(i).N_pontos;
+                    array(k,6)=s(j).N_pontos;
+                    k = k+1;
+                end                  
+            end
+        end
+        
+        % Depois de verificadas as separaï¿½ï¿½es ï¿½ necessï¿½rio juntar as regiï¿½es.
+        % Para isso vai-se juntar as ï¿½reas mais pequenas ï¿½s maiores.
+        if k > 1
+            
+            [linhas,~] = size(array);
+            
+            for i=1:linhas    
+                if array(i,1) ~= array(i,2)
+                    if array(i,3) > array(i,4)
+                        control = 1;             
+                    else
+                        control = 2;                   
+                    end      
+                
+                    % Atribuiï¿½ï¿½o dos valores de ï¿½rea e do nï¿½mero de pontos
+                    s(array(i,control)).Area = array(i,3)+array(i,4);
+                    s(array(i,control)).N_pontos = array(i,5)+array(i,6);
+
+                    % Cï¿½lculo do novo centroide corresponderï¿½ ao ponto mï¿½dio
+                    % entre os dois anteriores
+                    dif1_medio = abs(s(array(i,1)).Centroid(1) - s(array(i,2)).Centroid(1))/2;
+                    dif2_medio = abs(s(array(i,1)).Centroid(2) - s(array(i,2)).Centroid(2))/2;
+                
+                    if s(array(i,1)).Centroid(1) > s(array(i,2)).Centroid(1)
+                        s(arrray(i,control)).Centroid(2) = s(array(i,2)).Centroid(2) + dif2_medio;
+                    else
+                        s(array(i,control)).Centroid(2) = s(array(i,1)).Centroid(2) + dif2_medio;
+                    end
+                
+                    % Guarda a linha da estrutura que ï¿½ necessï¿½rio eliminar
+                    % num vetor para no fim se eliminar tudo de uma sï¿½ vez.
+                    if control == 1
+                        % Procura quais os ï¿½ndices com o mesmo valor para
+                        % se poder atribuir o nï¿½mero da nova linha
+                        [idx1,idx2] = find(array(:,3:4) == array(i,4));
+                        
+                        apagar(ind_apagar) = array(i,2);
+                        ind_apagar = ind_apagar + 1;
+                        
+                        % Mudanï¿½a do nï¿½mero da linha
+                        for j=1:length(idx1)
+                            array(idx1,idx2) = array(i,1);                    
+                        end
+                        
+                    else
+                        % Procura quais os ï¿½ndices com o mesmo valor para
+                        % se poder atribuir o nï¿½mero da nova linha
+                        [idx1,idx2] = find(array(:,3:4) == array(i,3));
+                        
+                        apagar(ind_apagar) = array(i,1);
+                        ind_apagar = ind_apagar + 1;
+                        
+                        % Mudanï¿½a do nï¿½mero da linha
+                        for j=1:length(idx1)
+                            array(idx1,idx2) = array(i,2);                    
+                        end                        
+                    end
+                end
+            end
+            
+            % Ordena as linhas que sï¿½o necessï¿½rias apagar e de seguida
+            % apaga-as.
+            apagar = sort(apagar, 'descend');
+            for j=1:(ind_apagar-1)                
+                s(apagar(j))=[];
+            end 
+        end             
+        
+    end
+
+end
+
+
+
+
+
+
+
