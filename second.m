@@ -26,6 +26,7 @@ cl1=reshape(im1,480*640,3);
 cl2=reshape(im2,480*640,3);
 p1=pointCloud(xyz_1,'Color',cl1);
 p2=pointCloud(xyz_2,'Color',cl2);
+
 %% conversão das coordenadas xyz de cada ponto da depth, para indices u,v da
 %imagem rgb
 RT=horzcat(cam_params.R, cam_params.T);
