@@ -1,9 +1,9 @@
-%inicialização
+%inicializaï¿½ï¿½o
 clear all;
 close all;
 clc;
 
-%declaração de variaveis globais
+%declaraï¿½ï¿½o de variaveis globais
 numero_imagens=25;
 imagens_background=round(numero_imagens*0.4);
 nome_depth='depth';
@@ -12,7 +12,7 @@ load cameraparametersAsus.mat;
 objects(1)=struct('x',[],'y',[],'z',[],'frames_tracked',[]);
 objectos=0;
 last_objects=[];
-%% Cálculo da imagem depth de background para as duas câmaras, e das respectivas coordenadas
+%% Cï¿½lculo da imagem depth de background para as duas cï¿½maras, e das respectivas coordenadas
 back1=zeros(480,640, imagens_background);
 back2=zeros(480,640, imagens_background);
 i=1;
@@ -35,12 +35,12 @@ clear nome1_depth nome2_depth i imagens_background;
 
 %% Ciclo principal do projecto
 %Este ciclo percorre todas as imagens, deteta os objectos, efetua o seu
-%tracking e armazena a informação devidamente
+%tracking e armazena a informaï¿½ï¿½o devidamente
 
 for i=1:numero_imagens
     if i==1
-        %é a primeira imagem de cada câmara, logo não é preciso comparar os
-        %objectos detetados com nada, é só inserir
+        %ï¿½ a primeira imagem de cada cï¿½mara, logo nï¿½o ï¿½ preciso comparar os
+        %objectos detetados com nada, ï¿½ sï¿½ inserir
         nome1_depth=strcat(nome_depth,num2str(1),'_',num2str(i),'.mat');
         nome2_depth=strcat(nome_depth,num2str(2),'_',num2str(i),'.mat');
         nome1_rgb=strcat(nome_rgb,num2str(1),'_',num2str(i),'.png');
@@ -58,13 +58,13 @@ for i=1:numero_imagens
         xyz_original_1=get_xyzasus(im_depth1(:), [480 640], find(im_depth1(:)>0), cam_params.Kdepth, 1, 0);
         xyz_original_2=get_xyzasus(im_depth2(:), [480 640], find(im_depth2(:)>0), cam_params.Kdepth, 1, 0);
     
-        %% Remoção do background
+        %% Remoï¿½ï¿½o do background
         %Retira o background, retira pontos a que a profundidade seja superior
-        %a 6,5m por não serem precisos, e retira pontos em que na imagem de
-        %background a profundidade é nula, por não serem pontos válidos
+        %a 6,5m por nï¿½o serem precisos, e retira pontos em que na imagem de
+        %background a profundidade ï¿½ nula, por nï¿½o serem pontos vï¿½lidos
         for aux1=1:480
         for aux2=1:640
-            %câmara 1
+            %cï¿½mara 1
             %if aux1==129 && aux2==523
             %    debug=1;
             %end
@@ -77,7 +77,7 @@ for i=1:numero_imagens
             if (back1(aux1,aux2)==0)
                 im_depth1(aux1,aux2)=0;
             end
-            %câmara 2
+            %cï¿½mara 2
             if ((back2(aux1,aux2)-im_depth2(aux1,aux2))<=250)
                 im_depth2(aux1,aux2)=0;
             end
@@ -103,12 +103,12 @@ for i=1:numero_imagens
         p2=pointCloud(xyz_backremoved2,'Color',cl2);
 
 
-        %% Deteção de objectos na imagem de profundidade
+        %% Deteï¿½ï¿½o de objectos na imagem de profundidade
         [l1, num1]=bwlabel(im_depth1);
         for aux1=1:num1
         [row, col]=find(l1==aux1);
        	if(length(row)<400)
-        %significa que não tem pontos suficientes, logo não é objecto
+        %significa que nï¿½o tem pontos suficientes, logo nï¿½o ï¿½ objecto
             for aux2=1:length(row)
                 l1(row(aux2), col(aux2))=0;
             end
@@ -120,7 +120,7 @@ for i=1:numero_imagens
         for aux1=1:num2
         [row, col]=find(l2==aux1);
         if(length(row)<400)
-            %significa que nao tem pontos suficientes, logo não é objecto
+            %significa que nao tem pontos suficientes, logo nï¿½o ï¿½ objecto
             for aux2=1:length(row)
                 l2(row(aux2), col(aux2))=0;
         	end
@@ -132,8 +132,8 @@ for i=1:numero_imagens
         %imagesc([l1, l2]);
         %figure(8);
         %imagesc([im_rgb1, im_rgb2]);
-        %Filtro para garantir que não há pontos incorretamente medidos na
-        %extremidade dos objectos que levem, a uma incorreta obtenção da caixa
+        %Filtro para garantir que nï¿½o hï¿½ pontos incorretamente medidos na
+        %extremidade dos objectos que levem, a uma incorreta obtenï¿½ï¿½o da caixa
         l1=imclose(l1, strel('disk',10));
         l2=imclose(l2, strel('disk',10));
     
@@ -150,9 +150,9 @@ for i=1:numero_imagens
         %figure(9);
         %imagesc([im_depth1, G1]);
     
-        %% Cálculo das caixas para cada um dos objectos detetados nas duas imagens
+        %% Cï¿½lculo das caixas para cada um dos objectos detetados nas duas imagens
         %este ciclo percorre todos os objectos encontrados na imagem 1 e calcula a caixa no
-        %qual cada um está incluido. os valores limites da caixa devem depois
+        %qual cada um estï¿½ incluido. os valores limites da caixa devem depois
         %ser armazenados na estrutura correspondnete ao tracking
         xmax_1=zeros(1,num1);
         ymax_1=zeros(1,num1);
@@ -185,7 +185,7 @@ for i=1:numero_imagens
             end
         end
         %este ciclo percorre todos os objectos encontrados na imagem 2 e
-        %calcula a caixa no qual cada objecto está incluido. Os valores limites
+        %calcula a caixa no qual cada objecto estï¿½ incluido. Os valores limites
         %da caixa devem depois ser armazenados para posteriormente serem
         %colocados na estrutura dos objectos detetados
         xmax_2=zeros(1,num2);
@@ -220,7 +220,7 @@ for i=1:numero_imagens
         end
         stats = regionprops(l1,'centroid', 'Area');
         
-        %fim da análise da imagem1
+        %fim da anï¿½lise da imagem1
         for aux1=1:num1
             objects(aux1).x=[xmin_1(1,aux1), xmin_1(1,aux1), xmin_1(1,aux1), xmin_1(1,aux1), xmax_1(1,aux1), xmax_1(1,aux1), xmax_1(1,aux1), xmax_1(1,aux1)];
             objects(aux1).y=[ymin_1(1,aux1), ymin_1(1,aux1), ymax_1(1,aux1), ymax_1(1,aux1), ymin_1(1,aux1), ymin_1(1,aux1), ymax_1(1,aux1), ymax_1(1,aux1)];
@@ -235,10 +235,10 @@ for i=1:numero_imagens
     else
 %==========================================================================
 %==========================================================================
-        %a partir da segunda imagem já é necessáio comparar os objectos que
-        %são detetados com aqueles que foram detetados anteriormente para
-        %efetuar o tracking do objecto ao invés de inserir um objecto novo
-        %cada vez que um objeto é detetado
+        %a partir da segunda imagem jï¿½ ï¿½ necessï¿½io comparar os objectos que
+        %sï¿½o detetados com aqueles que foram detetados anteriormente para
+        %efetuar o tracking do objecto ao invï¿½s de inserir um objecto novo
+        %cada vez que um objeto ï¿½ detetado
         nome1_depth=strcat(nome_depth,num2str(1),'_',num2str(i),'.mat');
         nome2_depth=strcat(nome_depth,num2str(2),'_',num2str(i),'.mat');
         nome1_rgb=strcat(nome_rgb,num2str(1),'_',num2str(i),'.png');
@@ -256,10 +256,10 @@ for i=1:numero_imagens
         xyz_original_1=get_xyzasus(im_depth1(:), [480 640], find(im_depth1(:)>0), cam_params.Kdepth, 1, 0);
         xyz_original_2=get_xyzasus(im_depth2(:), [480 640], find(im_depth2(:)>0), cam_params.Kdepth, 1, 0);
         
-        %% Remoção do background
+        %% Remoï¿½ï¿½o do background
         for aux1=1:480
         for aux2=1:640
-            %câmara 1
+            %cï¿½mara 1
             %if aux1==129 && aux2==523
             %    debug=1;
             %end
@@ -272,7 +272,7 @@ for i=1:numero_imagens
             if (back1(aux1,aux2)==0)
                 im_depth1(aux1,aux2)=0;
             end
-            %câmara 2
+            %cï¿½mara 2
             if ((back2(aux1,aux2)-im_depth2(aux1,aux2))<=250)
                 im_depth2(aux1,aux2)=0;
             end
@@ -296,12 +296,12 @@ for i=1:numero_imagens
         cl2=reshape(rgbd2,480*640,3);
         p1=pointCloud(xyz_backremoved1,'Color',cl1);
         p2=pointCloud(xyz_backremoved2,'Color',cl2);
-        %% Deteção de objectos na imagem de profundidade
+        %% Deteï¿½ï¿½o de objectos na imagem de profundidade
         [l1, num1]=bwlabel(im_depth1);
         for aux1=1:num1
         [row, col]=find(l1==aux1);
        	if(length(row)<400)
-        %significa que não tem pontos suficientes, logo não é objecto
+        %significa que nï¿½o tem pontos suficientes, logo nï¿½o ï¿½ objecto
             for aux2=1:length(row)
                 l1(row(aux2), col(aux2))=0;
             end
@@ -312,7 +312,7 @@ for i=1:numero_imagens
         for aux1=1:num2
         [row, col]=find(l2==aux1);
         if(length(row)<400)
-            %significa que nao tem pontos suficientes, logo não é objecto
+            %significa que nao tem pontos suficientes, logo nï¿½o ï¿½ objecto
             for aux2=1:length(row)
                 l2(row(aux2), col(aux2))=0;
         	end
@@ -323,13 +323,13 @@ for i=1:numero_imagens
         %imagesc([l1, l2]);
         %figure(8);
         %imagesc([im_rgb1, im_rgb2]);
-        %Filtro para garantir que não há pontos incorretamente medidos na
-        %extremidade dos objectos que levem, a uma incorreta obtenção da caixa
+        %Filtro para garantir que nï¿½o hï¿½ pontos incorretamente medidos na
+        %extremidade dos objectos que levem, a uma incorreta obtenï¿½ï¿½o da caixa
         l1=imclose(l1, strel('disk',10));
         l2=imclose(l2, strel('disk',10));
-        %% Cálculo da caixa em que o onjecto se encontra contido
+        %% Cï¿½lculo da caixa em que o onjecto se encontra contido
         %este ciclo percorre todos os objectos encontrados na imagem 1 e calcula a caixa no
-        %qual cada um está incluido. os valores limites da caixa devem depois
+        %qual cada um estï¿½ incluido. os valores limites da caixa devem depois
         %ser armazenados na estrutura correspondnete ao tracking
         xmax_1=zeros(1,num1);
         ymax_1=zeros(1,num1);
@@ -362,7 +362,7 @@ for i=1:numero_imagens
             end
         end
         %este ciclo percorre todos os objectos encontrados na imagem 2 e
-        %calcula a caixa no qual cada objecto está incluido. Os valores limites
+        %calcula a caixa no qual cada objecto estï¿½ incluido. Os valores limites
         %da caixa devem depois ser armazenados para posteriormente serem
         %colocados na estrutura dos objectos detetados
         xmax_2=zeros(1,num2);
@@ -400,38 +400,38 @@ for i=1:numero_imagens
         %% 
         if(num1>0)
             %significa que temos objetos a serem detetados na imagem atual,
-            %logo temos de verificar a correspondência entre objectos.
+            %logo temos de verificar a correspondï¿½ncia entre objectos.
             
-            %necessario correr a função hungaro para verificar as
-            %correspondências entre objectos, para isso, são avaliados
-            %diversos parâmetros, como a area do objecto, a distância entre
-            %o centróide de cada objecto de imagem para imagem
-            %Por enquanto, esta função relaciona a area dos dois objectos
+            %necessario correr a funï¿½ï¿½o hungaro para verificar as
+            %correspondï¿½ncias entre objectos, para isso, sï¿½o avaliados
+            %diversos parï¿½metros, como a area do objecto, a distï¿½ncia entre
+            %o centrï¿½ide de cada objecto de imagem para imagem
+            %Por enquanto, esta funï¿½ï¿½o relaciona a area dos dois objectos
             distancia_entre_centroides = zeros(length(last_stats),length(stats));
             area_dos_objectos = zeros(length(last_stats),length(stats));
              %compara todos os objectos da imagem atual com todos os objectos
             %que existiam na imagem anterior, para elaborar a matriz de
-            %relaçoes
+            %relaï¿½oes
             for aux1=1:last_num1
                 for aux2=1:num1
-                %Cálculo da relação entre a distância dos centroides dos
+                %Cï¿½lculo da relaï¿½ï¿½o entre a distï¿½ncia dos centroides dos
                 %objectos
                 distancia_entre_centroides(aux1, aux2)=norm((last_stats(aux1).Centroid)-(stats(aux2).Centroid));
-                %Cálculo da relação entre as áreas dos objectos detetados
+                %Cï¿½lculo da relaï¿½ï¿½o entre as ï¿½reas dos objectos detetados
                 area_dos_objectos(aux1,aux2)=abs((last_stats(aux1).Area)/(stats(aux2).Area));
                 end
             end
             matrix=zeros(last_num1,num1);
-            %pesos das diversas relações entre os objectos
+            %pesos das diversas relaï¿½ï¿½es entre os objectos
             peso_distancia=0.6;
             peso_area=0.4;
             
-            % Tabela com o custo total de associação de cada par de
-            % regiões, tendo em conta todos os parâmetros definidos. A
+            % Tabela com o custo total de associaï¿½ï¿½o de cada par de
+            % regiï¿½es, tendo em conta todos os parï¿½metros definidos. A
             % soma do valor 500 ocorre para colmatar um erro
-            % identificado no algoritmo hungaro (função munkres) que
+            % identificado no algoritmo hungaro (funï¿½ï¿½o munkres) que
             % opta pelo menor custo, mesmo que para isso ignore o
-            % melhor caso. Com esta soma, apenas o ruído é 
+            % melhor caso. Com esta soma, apenas o ruï¿½do ï¿½ 
             % intensificado, de maneira a colmatar o referido erro.
             for aux1=1:last_num1
                 for k=1:num1
@@ -445,7 +445,7 @@ for i=1:numero_imagens
             [linhas, colunas]=size(matrix);
             [a,b] = munkres(matrix);
             
-            %1º caso, numero de objectos iguais nas duas imagens
+            %1ï¿½ caso, numero de objectos iguais nas duas imagens
             if  (colunas==linhas)
                 debug=1;
                 for aux1=1:length(a)
@@ -457,7 +457,7 @@ for i=1:numero_imagens
                     last_objects(indice,1)=a(aux1);
                 end   
             end
-            %2º caso, maior numero de colunas->novos objectos
+            %2ï¿½ caso, maior numero de colunas->novos objectos
             if(colunas>linhas)
                 %atualiza os objetos ja existente
                 for aux1=1:length(a)
@@ -481,14 +481,14 @@ for i=1:numero_imagens
                         
                    end
             end
-            %3º caso, menor numero de colunas->objectos desaparecam
+            %3ï¿½ caso, menor numero de colunas->objectos desaparecam
    
             
             
         end
     
     end
-    %% Armazena os dados correspondentes às duas últimas imagens
+    %% Armazena os dados correspondentes ï¿½s duas ï¿½ltimas imagens
     last_im_rgb1=im_rgb1;
     last_im_rgb2=im_rgb2;
     last_im_depth1=im_depth1;
@@ -502,5 +502,5 @@ for i=1:numero_imagens
   
 end
 
-%% Funções externas
+%% Funï¿½ï¿½es externas
 %foram retiradas da internet
